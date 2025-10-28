@@ -1,0 +1,216 @@
+@startuml
+' --- Preamble and Styling ---
+title Internship Placement Management System - UML Class Diagram
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+' --- Enums (Enumerations) ---
+' These classes represent fixed sets of constants as described in the PDF.
+enum InternshipLevel {
+  BASIC
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum InternshipStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FILLED
+}
+
+enum ApplicationStatus {
+  PENDING
+  SUCCESSFUL
+  UNSUCCESSFUL
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+' --- Base User Class (Abstraction & Inheritance) ---
+' User is abstract; you can't create a generic "User".
+' It provides the base for all specific user types.
+abstract class User {
+  # userID: String
+  # name: String
+  - password: String
+  + login(id, pass): boolean
+  + logout(): void
+  + changePassword(newPass): void
+}
+note right of User::password
+  **Encapsulation:**
+  The user's password is kept
+  private. It can only be
+  modified via the public
+  `changePassword()` method,
+  which can enforce validation.
+end note
+
+note top of User
+  **Abstraction & Inheritance:**
+  `User` is an abstract base class that
+  defines common attributes and behaviors
+  (like login) for all user types.
+  `Student`, `CompanyRepresentative`, and
+  `CareerCenterStaff` inherit from it.
+end note
+
+' --- Concrete User Classes (Inheritance) ---
+class Student extends User {
+  - yearOfStudy: int
+  - major: String
+  + viewAvailableInternships(): List<Internship>
+  + applyForInternship(internship): boolean
+  + viewApplicationStatus(): Map<Internship, ApplicationStatus>
+  + acceptPlacement(application): void
+  + requestWithdrawal(application): WithdrawalRequest
+}
+
+class CompanyRepresentative extends User {
+  - companyName: String
+  - department: String
+  - position: String
+  - isApproved: boolean
+  + createInternship(...): Internship
+  + viewApplications(internship): List<Application>
+  + approveApplication(application): void
+  + rejectApplication(application): void
+  + toggleVisibility(internship, isVisible): void
+}
+
+class CareerCenterStaff extends User {
+  - staffDepartment: String
+  + authorizeCompanyRep(rep, isAuthorized): void
+  + approveInternship(internship, isApproved): void
+  + rejectInternship(internship, isRejected): void
+  + approveWithdrawal(request, isApproved): void
+  + rejectWithdrawal(request, isRejected): void
+  + generateReport(filters): Report
+}
+
+' --- Core Entities ---
+class Internship {
+  - internshipID: String
+  - title: String
+  - description: String
+  - openingDate: Date
+  - closingDate: Date
+  - companyName: String
+  - slots: int
+  - slotsFilled: int
+  - isVisible: boolean
+}
+
+class Report {
+  - generatedDate: Date
+  - content: String
+  + printReport(): void
+}
+
+' --- Association Classes (Handling Relationships) ---
+' An Application links a Student to an Internship.
+class Application {
+  - applicationID: String
+}
+
+' A WithdrawalRequest is created by a Student for an Application.
+class WithdrawalRequest {
+  - requestID: String
+}
+
+' --- UI/Boundary Interface (Polymorphism) ---
+' This interface allows the main system to show the correct
+' menu for the current user without knowing their specific type.
+interface UserMenu {
+  + displayMenu(user): void
+}
+
+class StudentMenu implements UserMenu {
+  + displayMenu(user): void
+}
+class CompanyRepMenu implements UserMenu {
+  + displayMenu(user): void
+}
+class StaffMenu implements UserMenu {
+  + displayMenu(user): void
+}
+note top of UserMenu
+  **Polymorphism:**
+  The main system can hold a variable
+  of type `UserMenu`.
+  
+  `menu = new StudentMenu()`
+  `menu.displayMenu(currentUser)`
+  
+  This single call works for `StudentMenu`,
+  `CompanyRepMenu`, and `StaffMenu`,
+  allowing for flexible and extensible UI.
+end note
+
+' --- Control/Manager Classes ---
+' These classes manage the main logic and data.
+class InternshipManagementSystem {
+  - users: List<User>
+  - internships: List<Internship>
+  - applications: List<Application>
+  - currentUser: User
+  + main(): void
+  - runCli(): void
+  - showUserMenu(): void
+  - loadUserData(): void
+}
+
+class ReportGenerator {
+  + generateInternshipReport(internships, filters): Report
+}
+
+' --- Relationships ---
+
+' Aggregation: The main system "has" lists of users and entities.
+InternshipManagementSystem o-- "0..*" User
+InternshipManagementSystem o-- "0..*" Internship
+InternshipManagementSystem o-- "0..*" Application
+InternshipManagementSystem o-- "0..*" WithdrawalRequest
+
+' Composition: Entities are "composed of" enums.
+Internship *-- "1" InternshipLevel
+Internship *-- "1" InternshipStatus
+Application *-- "1" ApplicationStatus
+WithdrawalRequest *-- "1" RequestStatus
+
+' Associations
+' 1 Student has 0..3 Applications
+Student "1" -- "0..3" Application : "submits"
+note on link: Max 3 applications per student.
+
+' 1 Internship has 0..* Applications
+Internship "1" -- "0..*" Application : "receives"
+
+' 1 Company Rep manages 0..5 Internships
+CompanyRepresentative "1" -- "0..5" Internship : "creates/manages"
+note on link: Max 5 internships per rep.
+
+' 1 Internship is owned by 1 Company Rep
+Internship "1" -- "1" CompanyRepresentative : "owned by"
+
+' WithdrawalRequest is for 1 Application
+WithdrawalRequest "1" -- "1" Application : "for"
+' WithdrawalRequest is submitted by 1 Student
+WithdrawalRequest "1" -- "1" Student : "from"
+' WithdrawalRequest is handled by 1 Staff
+WithdrawalRequest "1" -- "1" CareerCenterStaff : "handled by"
+
+' Dependency: Staff uses ReportGenerator
+CareerCenterStaff "1" ..> "1" ReportGenerator : "uses"
+ReportGenerator ..> Report : "creates"
+
+' Dependency: Main system uses the UI
+InternshipManagementSystem ..> UserMenu : "uses"
+
+@enduml
