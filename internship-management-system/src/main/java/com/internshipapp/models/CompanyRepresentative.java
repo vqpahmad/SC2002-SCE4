@@ -23,42 +23,6 @@ public class CompanyRepresentative extends User {
         this.createdInternships = new ArrayList<>();
     }
 
-    public Internship createInternship(String title, String description, InternshipLevel level, String preferedMajor,
-            Date openingDate, Date closingDate, int slots) {
-        if (!isApproved) {
-            System.out.println("Company Representative is not approved to create internships.");
-            return null;
-        }
-        if (createdInternships.size() >= 5) {
-            System.out.println("Cannot create more than 5 internships.");
-            return null;
-        }
-        if (slots > 10) {
-            System.out.println("Cannot create internship with more than 10 slots.");
-            return null;
-        }
-
-        Internship newInternship = new Internship(
-            title,
-            description,
-            level,
-            preferedMajor,
-            openingDate,
-            closingDate,
-            InternshipStatus.PENDING,
-            this.companyName,
-            this,
-            slots,
-            0,
-            true // Default to visible
-        );
-
-        createdInternships.add(newInternship);
-        System.out.println("Internship '" + title + "' created successfully and is pending approval.");
-
-        return newInternship;
-    }
-
     public List<Application> viewApplications(Internship internship) {
         // Implementation for viewing applications for a specific internship
         if (internship.getOwner() != this) {

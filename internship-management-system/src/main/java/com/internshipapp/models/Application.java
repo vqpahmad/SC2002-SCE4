@@ -2,19 +2,17 @@ package com.internshipapp.models;
 
 import java.util.Date;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-
 import com.internshipapp.enums.*;
 
 public class Application {
     private String applicationID;
     private Student student;
     private Internship internship;
-    private Date applicationDate;
     private ApplicationStatus status;
+    private Date applicationDate;
 
-    public Application(Student student, Internship internship, ApplicationStatus status) {
-        this.applicationID = java.util.UUID.randomUUID().toString();
+    public Application(String applicationID, Student student, Internship internship, ApplicationStatus status) {
+        this.applicationID = applicationID;
         this.student = student;
         this.internship = internship;
         this.applicationDate = new Date();
@@ -23,6 +21,10 @@ public class Application {
 
     public String getApplicationID() {
         return applicationID;
+    }
+
+    public void setApplicationID(String applicationID) {
+        this.applicationID = applicationID;
     }
 
     public Student getStudent() {
@@ -35,6 +37,10 @@ public class Application {
 
     public Date getApplicationDate() {
         return applicationDate;
+    }
+
+    public void setApplicationDate(Date applicationDate) {
+        this.applicationDate = applicationDate;
     }
 
     public ApplicationStatus getStatus() {

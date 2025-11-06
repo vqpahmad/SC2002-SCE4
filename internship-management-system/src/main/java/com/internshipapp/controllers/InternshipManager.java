@@ -5,12 +5,24 @@ import com.internshipapp.enums.*;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvValidationException;
 
 public class InternshipManager {
 
     private List<Internship> internships;
+    private final String internshipsCsvFile = "internships.csv";
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private int lastInternshipNumericId = 0; // To track the last used ID number
 
     public InternshipManager(List<Internship> internships) {
         this.internships = internships;
@@ -20,25 +32,96 @@ public class InternshipManager {
         this.internships = new java.util.ArrayList<Internship>();
     }
 
+    public void loadInternships(UserManager userManager) {
+        try (CSVReader reader = new CSVReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(internshipsCsvFile)))) {
+            String[] line;
+            reader.readNext(); // Skip header
+            while ((line = reader.readNext()) != null) {
+                String id = line[0];
+                String title = line[1];
+                String description = line[2];
+                InternshipLevel level = InternshipLevel.valueOf(line[3]);
+                String preferredMajor = line[4];
+                Date openingDate = dateFormat.parse(line[5]);
+                Date closingDate = dateFormat.parse(line[6]);
+                InternshipStatus status = InternshipStatus.valueOf(line[7]);
+                String companyName = line[8];
+                CompanyRepresentative owner = userManager.findRepresentativeById(line[9]);
+                int slots = Integer.parseInt(line[10]);
+                int slotsFilled = Integer.parseInt(line[11]);
+                boolean isVisible = Boolean.parseBoolean(line[12]);
+
+                if (owner != null) {
+                    Internship internship = new Internship(id, title, description, level, preferredMajor, openingDate, closingDate, status, companyName, owner, slots, slotsFilled, isVisible);
+                    internships.add(internship);
+                    owner.getCreatedInternships().add(internship); // Link back to owner
+
+                    // Track the highest ID number to avoid duplicates
+                    try {
+                        int numericId = Integer.parseInt(id.substring(3));
+                        if (numericId > lastInternshipNumericId) {
+                            lastInternshipNumericId = numericId;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Ignore if ID is not in the expected format
+                    }
+                }
+            }
+        } catch (IOException | CsvValidationException | ParseException | NullPointerException e) {
+            System.out.println("Error loading internships: " + e.getMessage());
+        }
+    }
+
+    public void saveInternships() {
+        try {
+            URL resource = getClass().getClassLoader().getResource(internshipsCsvFile);
+            if (resource == null) throw new IOException("Cannot find resource file: " + internshipsCsvFile);
+            
+            try (CSVWriter writer = new CSVWriter(new FileWriter(Paths.get(resource.toURI()).toFile()))) {
+                String[] header = {"internshipID", "title", "description", "level", "preferedMajor", "openingDate", "closingDate", "status", "companyName", "ownerID", "slots", "slotsFilled", "isVisible"};
+                writer.writeNext(header);
+                for (Internship i : internships) {
+                    writer.writeNext(new String[]{
+                        i.getInternshipID(),
+                        i.getTitle(),
+                        i.getDescription(),
+                        i.getLevel().name(),
+                        i.getPreferedMajor(),
+                        dateFormat.format(i.getOpeningDate()),
+                        dateFormat.format(i.getClosingDate()),
+                        i.getStatus().name(),
+                        i.getCompanyName(),
+                        i.getOwner().getUserID(),
+                        String.valueOf(i.getSlots()),
+                        String.valueOf(i.getSlotsFilled()),
+                        String.valueOf(i.isVisible())
+                    });
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error saving internships: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Creates a new internship with a sequential ID, adds it to the list, and returns it.
+     */
     public Internship createInternship(String title, String description, InternshipLevel level, String preferedMajor,
-                                       Date openingDate, Date closingDate, String companyName, CompanyRepresentative owner, int slots) {
-        // The Internship constructor will set the initial status to PENDING_APPROVAL
-        Internship internship = new Internship(
-                title,
-                description,
-                level,
-                preferedMajor,
-                openingDate,
-                closingDate,
-                InternshipStatus.PENDING,
-                companyName,
-                owner,
-                slots,
-                0,
-                false // Initially not visible
+                                       Date openingDate, Date closingDate, CompanyRepresentative owner, int slots) {
+        
+        lastInternshipNumericId++; // Increment to get the next ID
+        String newId = String.format("INT%03d", lastInternshipNumericId);
+
+        Internship newInternship = new Internship(
+            newId, title, description, level, preferedMajor,
+            openingDate, closingDate, InternshipStatus.PENDING, 
+            owner.getCompanyName(), owner, slots, 0, false
         );
-        internships.add(internship);
-        return internship;
+
+        this.internships.add(newInternship);
+        owner.getCreatedInternships().add(newInternship);
+        
+        return newInternship;
     }
 
     public List<Internship> viewAvailableInternships(Student student) {
@@ -88,10 +171,6 @@ public class InternshipManager {
         Internship internship = application.getInternship();
         if (internship.getSlotsFilled() < internship.getSlots()) {
             application.setStatus(ApplicationStatus.APPROVED);
-            internship.setSlotsFilled(internship.getSlotsFilled() + 1);
-            if (internship.getSlotsFilled() == internship.getSlots()) {
-                internship.setStatus(InternshipStatus.FILLED);
-            }
         } else {
             System.out.println("Cannot approve application, all slots are filled.");
         }
@@ -102,13 +181,8 @@ public class InternshipManager {
     }
 
     public void toggleInternshipVisibility(Internship internship) {
-        // Only allow toggling if the internship is approved and not yet filled
-        if (internship.getStatus() == InternshipStatus.APPROVED) {
-            internship.setVisible(!internship.isVisible());
-            System.out.println("Visibility for internship " + internship.getInternshipID() + " set to " + internship.isVisible());
-        } else {
-            System.out.println("Cannot toggle visibility. Internship is not in an OPEN state.");
-        }
+        internship.setVisible(!internship.isVisible());
+        System.out.println("Visibility for internship '" + internship.getTitle() + "' is now " + (internship.isVisible() ? "ON" : "OFF"));
     }
 
     public Internship findInternshipById(String id) {
@@ -122,5 +196,22 @@ public class InternshipManager {
         return internships.stream()
                 .filter(i -> i.getStatus() == InternshipStatus.PENDING)
                 .collect(Collectors.toList());
+    }
+
+    public void removeInternship(Internship internshipToRemove) {
+        if (internshipToRemove == null) {
+            return;
+        }
+
+        // Remove applications associated with this internship from each student
+        for (Application app : internshipToRemove.getApplications()) {
+            app.getStudent().getApplications().remove(app);
+        }
+
+        // Remove from owner's list
+        internshipToRemove.getOwner().getCreatedInternships().remove(internshipToRemove);
+
+        // Remove from the main list
+        internships.remove(internshipToRemove);
     }
 }

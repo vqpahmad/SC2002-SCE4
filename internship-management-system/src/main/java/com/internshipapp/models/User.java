@@ -19,6 +19,10 @@ public abstract class User {
         return name;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public boolean login(String id, String pass) {
         if (this.userID.equals(id) && this.password.equals(pass)) {
             return true;
@@ -31,7 +35,7 @@ public abstract class User {
         System.out.println(name + "has been logged out.");
     }
 
-    public void changePassword(String newPass) {
+    public void setPassword(String newPass) {
         // Implement password change logic here
         password = newPass;
     }

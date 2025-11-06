@@ -24,6 +24,25 @@ public class Internship {
     private boolean isVisible;
     private List<Application> applications;
 
+   public Internship(String internshipID, String title, String description, InternshipLevel level, String preferedMajor,
+            Date openingDate, Date closingDate, InternshipStatus status, String companyName, CompanyRepresentative owner, int slots,
+            int slotsFilled, boolean isVisible) {
+        this.internshipID = internshipID;
+        this.title = title;
+        this.description = description;
+        this.level = level;
+        this.preferedMajor = preferedMajor;
+        this.openingDate = openingDate;
+        this.closingDate = closingDate;
+        this.status = status;
+        this.companyName = companyName;
+        this.owner = owner;
+        this.slots = slots;
+        this.slotsFilled = slotsFilled;
+        this.isVisible = isVisible;
+        this.applications = new ArrayList<Application>();
+    } 
+
    public Internship(String title, String description, InternshipLevel level, String preferedMajor,
             Date openingDate, Date closingDate, InternshipStatus status, String companyName, CompanyRepresentative owner, int slots,
             int slotsFilled, boolean isVisible) {

@@ -1,6 +1,5 @@
-internshipID,title,description,openingDate,closingDate,companyName,slots,slotsFilled,isVisible
-1,Software Engineer Internship,An internship for software engineering students,2023-01-01,2023-06-01,Tech Company,5,0,true
-2,Data Analyst Internship,An internship for data analysis students,2023-02-01,2023-07-01,Data Corp,3,1,true
-3,Marketing Internship,An internship for marketing students,2023-03-01,2023-08-01,Marketing LLC,2,0,false
-4,Web Development Internship,An internship for web development students,2023-04-01,2023-09-01,Web Solutions,4,2,true
-5,Graphic Design Internship,An internship for graphic design students,2023-05-01,2023-10-01,Design Studio,3,1,true
+internshipID,title,description,level,preferedMajor,openingDate,closingDate,status,companyName,ownerID,slots,slotsFilled,isVisible
+INT001,Software Engineer Intern,Develop and maintain web applications.,INTERMEDIATE,Computer Science,2025-10-01,2025-11-30,APPROVED,Tech Solutions,rep001,5,1,true
+INT002,Data Analyst Intern,Analyze user data to find insights.,BASIC,Data Science & AI,2025-09-15,2025-10-31,APPROVED,Innovate Inc.,rep002,2,0,true
+INT003,Backend Developer,Work on our core API services.,ADVANCED,Computer Engineering,2025-11-01,2025-12-15,PENDING,Tech Solutions,rep001,3,0,false
+INT004,Frontend Developer Intern,Build beautiful user interfaces.,BASIC,Computer Science,2025-10-20,2025-11-20,FILLED,Innovate Inc.,rep002,4,4,false
