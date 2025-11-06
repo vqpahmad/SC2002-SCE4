@@ -1,1 +1,3 @@
-"CompanyRepID","Name","Password","CompanyName","Department","Position","isApproved"
+CompanyRepID,Name,Password,CompanyName,Department,Position,isApproved
+"ahmad@gmail.com","Ahmad","password","Ahmad_IT","HR","Manager","true"
+"ali@gmail.com","ali","password","Microsoft","IT","Developer","true"

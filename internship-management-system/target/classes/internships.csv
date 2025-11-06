@@ -1,1 +1,5 @@
-"internshipID","title","description","level","preferedMajor","openingDate","closingDate","status","companyName","ownerID","slots","slotsFilled","isVisible"
+internshipID,title,description,level,preferedMajor,openingDate,closingDate,status,companyName,ownerID,slots,slotsFilled,isVisible
+INT001,Software Engineer Intern,Develop and maintain web applications.,INTERMEDIATE,Computer Science,2025-10-01,2025-11-30,APPROVED,Tech Solutions,ahmad@gmail.com,5,0,true
+INT002,Data Analyst Intern,Analyze user data to find insights.,BASIC,Data Science & AI,2025-09-15,2025-10-31,APPROVED,Innovate Inc.,ali@gmail.com,2,0,true
+INT003,Backend Developer,Work on our core API services.,ADVANCED,Computer Engineering,2025-11-01,2025-12-15,PENDING,Tech Solutions,ahmad@gmail.com,3,0,false
+INT004,Frontend Developer Intern,Build beautiful user interfaces.,BASIC,Computer Science,2025-10-20,2025-11-20,APPROVED,Innovate Inc.,ali@gmail.com,4,0,false

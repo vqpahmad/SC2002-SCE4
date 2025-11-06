@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "maven-package",
+            "type": "shell",
+            "command": "mvn package",
+            "options": {
+                "cwd": "${workspaceFolder}/internship-management-system"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "maven-clean-package",
+            "type": "shell",
+            "command": "mvn clean package",
+            "options": {
+                "cwd": "${workspaceFolder}/internship-management-system"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
