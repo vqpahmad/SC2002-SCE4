@@ -2,8 +2,6 @@ package com.internshipapp.models;
 
 import java.util.Date;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-
 import com.internshipapp.enums.*;
 import java.util.List;
 import java.util.ArrayList;

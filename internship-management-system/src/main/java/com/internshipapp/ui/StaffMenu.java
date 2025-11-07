@@ -5,8 +5,13 @@ import com.internshipapp.controllers.InternshipManager;
 import com.internshipapp.controllers.UserManager;
 import com.internshipapp.models.*;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -48,12 +53,36 @@ public class StaffMenu implements UserMenu {
                 case 1: processRepresentative(scanner); break;
                 case 2: processInternship(scanner); break;
                 case 3: processWithdrawal(scanner); break;
-                case 4: System.out.println(ansi().fg(YELLOW).a("Report generation is not yet implemented.").reset()); break;
+                case 4: generateReport(scanner); break;
                 case 5: changePassword(scanner); break;
                 case 0: System.out.println("Logging out..."); break;
                 default: System.out.println(ansi().fg(RED).a("Invalid choice. Please try again.").reset());
             }
         } while (choice != 0);
+    }
+
+    private void generateReport(Scanner scanner) {
+        System.out.println(ansi().fg(CYAN).a("\n--- Generate Internship Report ---").reset());
+        System.out.println("Enter filter criteria. Press Enter to skip a filter.");
+
+        System.out.print(ansi().fg(YELLOW).a("Filter by Status (PENDING, APPROVED, REJECTED, FILLED): ").reset());
+        String statusFilter = scanner.nextLine().toUpperCase();
+
+        System.out.print(ansi().fg(YELLOW).a("Filter by Preferred Major: ").reset());
+        String majorFilter = scanner.nextLine();
+
+        System.out.print(ansi().fg(YELLOW).a("Filter by Level (BASIC, INTERMEDIATE, ADVANCED): ").reset());
+        String levelFilter = scanner.nextLine().toUpperCase();
+
+        List<Internship> reportData = internshipManager.generateReport(statusFilter, majorFilter, levelFilter);
+
+        System.out.println(ansi().fg(CYAN).a("\n--- Report Results ---").reset());
+        if (reportData.isEmpty()) {
+            System.out.println(ansi().fg(YELLOW).a("No internships found matching your criteria.").reset());
+        } else {
+            reportData.forEach(i -> System.out.println("ID: " + i.getInternshipID() + " | Title: " + i.getTitle() + " | Status: " + i.getStatus() + " | Major: " + i.getPreferedMajor()));
+            System.out.println(ansi().fg(YELLOW).a("\n" + reportData.size() + " records found.").reset());
+        }
     }
 
     private void processRepresentative(Scanner scanner) {

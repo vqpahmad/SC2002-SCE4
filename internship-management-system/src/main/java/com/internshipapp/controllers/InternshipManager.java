@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
+import java.util.stream.Stream; // Add this import
 
 public class InternshipManager {
 
@@ -214,4 +215,21 @@ public class InternshipManager {
         // Remove from the main list
         internships.remove(internshipToRemove);
     }
+
+    public List<Internship> generateReport(String status, String major, String level) {
+        Stream<Internship> stream = internships.stream();
+
+        if (status != null && !status.trim().isEmpty()) {
+            stream = stream.filter(i -> i.getStatus().name().equalsIgnoreCase(status));
+        }
+        if (major != null && !major.trim().isEmpty()) {
+            stream = stream.filter(i -> i.getPreferedMajor().equalsIgnoreCase(major));
+        }
+        if (level != null && !level.trim().isEmpty()) {
+            stream = stream.filter(i -> i.getLevel().name().equalsIgnoreCase(level));
+        }
+
+        return stream.collect(Collectors.toList());
+    }
+
 }

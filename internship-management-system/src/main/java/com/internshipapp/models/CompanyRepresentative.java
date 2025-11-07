@@ -1,9 +1,7 @@
 package com.internshipapp.models;
 
-import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
-import com.internshipapp.enums.*;
 import com.internshipapp.enums.*;
 
 
