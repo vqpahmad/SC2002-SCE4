@@ -75,6 +75,7 @@ public class StudentMenu implements UserMenu {
                     break;
                 case 6:
                     changePassword(scanner);
+                    choice = 0;
                     break;
                 case 0:
                     System.out.println("Logging out...");

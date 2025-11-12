@@ -87,6 +87,7 @@ public class CompanyRepMenu implements UserMenu {
                     break;
                 case 9:
                     changePassword(scanner);
+                    choice = 0;
                     break;
                 case 0:
                     System.out.println("Logging out...");

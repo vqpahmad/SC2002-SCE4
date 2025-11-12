@@ -66,7 +66,7 @@ public class StaffMenu implements UserMenu {
                 case 2: processInternship(scanner); break;
                 case 3: processWithdrawal(scanner); break;
                 case 4: generateReport(scanner); break;
-                case 5: changePassword(scanner); break;
+                case 5: changePassword(scanner); choice = 0; break;
                 case 0: System.out.println("Logging out..."); break;
                 default: System.out.println(ansi().fg(RED).a("Invalid choice. Please try again.").reset());
             }
