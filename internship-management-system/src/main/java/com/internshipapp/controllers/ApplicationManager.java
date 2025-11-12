@@ -17,6 +17,10 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 
+/**
+ * Controller responsible for creating and managing {@link com.internshipapp.models.Application}
+ * instances and withdrawal requests. Handles persistence to the CSV resource.
+ */
 public class ApplicationManager {
     private List<Application> applications;
     private List<WithdrawalRequest> withdrawalRequests;
@@ -24,11 +28,21 @@ public class ApplicationManager {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private int lastApplicationNumericId = 0; // To track the last used ID number
 
+    /**
+     * Create a new ApplicationManager with empty lists.
+     */
     public ApplicationManager() {
         this.applications = new ArrayList<>();
         this.withdrawalRequests = new ArrayList<>();
     }
 
+    /**
+     * Load persisted applications from the CSV resource and link them to
+     * users and internships.
+     *
+     * @param userManager user manager used to resolve student references
+     * @param internshipManager internship manager used to resolve internships
+     */
     public void loadApplications(UserManager userManager, InternshipManager internshipManager) {
         try (CSVReader reader = new CSVReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(applicationsCsvFile)))) {
             String[] line;
@@ -65,6 +79,9 @@ public class ApplicationManager {
         }
     }
 
+    /**
+     * Persist current applications to the applications CSV resource.
+     */
     public void saveApplications() {
         try {
             URL resource = getClass().getClassLoader().getResource(applicationsCsvFile);
@@ -91,6 +108,14 @@ public class ApplicationManager {
     /**
      * Creates a new application with a sequential ID, adds it to all relevant lists, and returns it.
      */
+    /**
+     * Creates a new application with a sequential ID, adds it to internal
+     * collections and links it to the student and internship.
+     *
+     * @param student the applying student
+     * @param internship the internship being applied for
+     * @return the created Application instance
+     */
     public Application createApplication(Student student, Internship internship) {
         lastApplicationNumericId++; // Increment to get the next ID
         String newId = String.format("APP%03d", lastApplicationNumericId);
@@ -104,6 +129,14 @@ public class ApplicationManager {
         return newApplication;
     }
 
+    /**
+     * Attempts to apply the given student for the specified internship.
+     * Performs basic validation (max 3 applications, not already applied).
+     *
+     * @param student the student applying
+     * @param internship the internship to apply for
+     * @return the created Application if successful, or null on failure
+     */
     public Application applyForInternship(Student student, Internship internship) {
         if (student.getApplications().size() >= 3) {
             System.out.println("Error: Cannot apply for more than 3 internships.");
@@ -120,6 +153,12 @@ public class ApplicationManager {
         return newApplication;
     }
 
+    /**
+     * Accepts an approved placement for a student, updates slot counts and
+     * marks other pending applications as unsuccessful.
+     *
+     * @param application the application to accept
+     */
     public void acceptPlacement(Application application) {
         if (application != null && application.getStatus() == ApplicationStatus.APPROVED && application.getInternship().getSlotsFilled() < application.getInternship().getSlots()) {
             application.setStatus(ApplicationStatus.ACCEPTED);
@@ -141,6 +180,13 @@ public class ApplicationManager {
         }
     }
 
+    /**
+     * Creates a withdrawal request for the given application and stores it
+     * in the internal list.
+     *
+     * @param application the application to withdraw
+     * @return the created WithdrawalRequest or null if application is null
+     */
     public WithdrawalRequest requestWithdrawal(Application application) {
         if (application != null) {
             WithdrawalRequest request = new WithdrawalRequest(application);
@@ -150,16 +196,33 @@ public class ApplicationManager {
         return null;
     }
 
+    /**
+     * Add an externally-created withdrawal request to be processed later.
+     *
+     * @param request the withdrawal request to add
+     */
     public void addWithdrawalRequest(WithdrawalRequest request) {
         this.withdrawalRequests.add(request);
     }
 
+    /**
+     * Returns the list of withdrawal requests that are in the PENDING state and
+     * still require staff processing.
+     *
+     * @return list of pending withdrawal requests
+     */
     public List<WithdrawalRequest> getPendingWithdrawalRequests() {
         return withdrawalRequests.stream()
                 .filter(r -> r.getStatus() == RequestStatus.PENDING)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Find a withdrawal request by its request ID.
+     *
+     * @param id request identifier
+     * @return matching WithdrawalRequest or null if not found
+     */
     public WithdrawalRequest findRequestById(String id) {
         return withdrawalRequests.stream()
                 .filter(r -> r.getRequestID().equals(id))
@@ -167,6 +230,13 @@ public class ApplicationManager {
                 .orElse(null);
     }
 
+    /**
+     * Process a withdrawal request: approve or reject it and update related
+     * application/internship state accordingly.
+     *
+     * @param request the request to process
+     * @param approve true to approve, false to reject
+     */
     public void processWithdrawalRequest(WithdrawalRequest request, boolean approve) {
         if (approve) {
             request.setStatus(RequestStatus.APPROVED);

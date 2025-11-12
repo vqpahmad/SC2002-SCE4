@@ -24,6 +24,8 @@ public class Student extends User {
 
     /**
      * Returns a list of all applications made by the student.
+     *
+     * @return list of applications
      */
     public List<Application> getApplications() {
         return this.applications;
@@ -32,6 +34,8 @@ public class Student extends User {
     /**
      * Accepts an internship offer. This changes the application status.
      * Additional logic (like withdrawing other applications) should be handled by a controller.
+     *
+     * @param application the application to accept
      */
     public void acceptPlacement(Application application) {
         if (this.applications.contains(application) && application.getStatus() == ApplicationStatus.APPROVED) {
@@ -44,6 +48,9 @@ public class Student extends User {
 
     /**
      * Creates a request to withdraw from an internship application.
+     *
+     * @param application the application to withdraw
+     * @return a newly created WithdrawalRequest or null if the application is not owned
      */
     public WithdrawalRequest requestWithdrawal(Application application) {
         if (this.applications.contains(application)) {

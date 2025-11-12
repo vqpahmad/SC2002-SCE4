@@ -21,10 +21,16 @@ public class UserManager {
     private final String staffCsvFile = "staff.csv";
     private final String companyRepCsvFile = "company_representatives.csv";
 
+    /**
+     * Create a new UserManager with an empty user list.
+     */
     public UserManager() {
         this.users = new ArrayList<>();
     }
 
+    /**
+     * Load all users from the CSV resources (students, staff and company reps).
+     */
     public void loadUsers() {
         users.clear(); // Clear any existing users before loading
         loadStudents();
@@ -70,6 +76,9 @@ public class UserManager {
         }
     }
 
+    /**
+     * Persist all users back to their CSV resources.
+     */
     public void saveUsers() {
         saveStudents();
         saveStaff();
@@ -130,6 +139,18 @@ public class UserManager {
         }
     }
 
+    /**
+     * Register a new company representative (in-memory). The representative
+     * will be created in an unapproved state.
+     *
+     * @param userId unique identifier for the representative
+     * @param password account password
+     * @param name representative's display name
+     * @param companyName company the representative belongs to
+     * @param department representative's department
+     * @param position representative's position/title
+     * @return true if registration succeeded, false if the userId is taken
+     */
     public boolean registerCompanyRepresentative(String userId, String password, String name, String companyName, String department, String position) {
         // Check if user ID already exists
         for (User user : users) {
@@ -143,6 +164,14 @@ public class UserManager {
     }
 
     // 0 = incorrect ID, 1 = incorrect password, 2 = unapproved rep, 3 = success
+    /**
+     * Attempt to login and return a status code.
+     * 0 = incorrect ID, 1 = incorrect password, 2 = unapproved rep, 3 = success
+     *
+     * @param userId candidate id
+     * @param password candidate password
+     * @return status code as documented above
+     */
     public int loginResult(String userId, String password) {
         for (User user : users) {
             if (user.login(userId, password)){
@@ -164,6 +193,13 @@ public class UserManager {
         return 0; // Return 0 if login fails
     }
 
+    /**
+     * Return the authenticated User instance if credentials match, otherwise null.
+     *
+     * @param userId candidate id
+     * @param password candidate password
+     * @return authenticated User or null
+     */
     public User login(String userId, String password) {
         for (User user : users) {
             if (user.login(userId, password)) {
@@ -173,6 +209,13 @@ public class UserManager {
         return null; // Return null if login fails
     }
 
+    /**
+     * Change a user's password.
+     *
+     * @param user target user
+     * @param newPassword new password value
+     * @return true on success
+     */
     public boolean changePassword(User user, String newPassword) {
         if  (user != null) {
             user.setPassword(newPassword);
@@ -181,6 +224,9 @@ public class UserManager {
         return false;
     }
 
+    /**
+     * @return list of unapproved company representatives
+     */
     public List<CompanyRepresentative> getPendingRepresentatives() {
         return users.stream()
                 .filter(u -> u instanceof CompanyRepresentative)
@@ -189,6 +235,12 @@ public class UserManager {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Find a company representative by id.
+     *
+     * @param id representative id
+     * @return matching CompanyRepresentative or null
+     */
     public CompanyRepresentative findRepresentativeById(String id) {
         return users.stream()
                 .filter(u -> u instanceof CompanyRepresentative && u.getUserID().equals(id))
@@ -198,6 +250,12 @@ public class UserManager {
     }
     
 
+    /**
+     * Find a user by id across all user types.
+     *
+     * @param id user id
+     * @return matching User or null
+     */
     public User findUserById(String id) {
         return users.stream()
                 .filter(u -> u.getUserID().equals(id))

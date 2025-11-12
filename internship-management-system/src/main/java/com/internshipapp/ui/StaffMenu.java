@@ -16,12 +16,24 @@ import java.util.stream.Stream;
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 
+/**
+ * Console UI menu for career center staff. Allows authorizing company representatives,
+ * approving/rejecting internships, processing withdrawal requests and generating reports.
+ */
 public class StaffMenu implements UserMenu {
     private CareerCenterStaff staff;
     private UserManager userManager;
     private InternshipManager internshipManager;
     private ApplicationManager applicationManager;
 
+    /**
+     * Construct a new StaffMenu for a logged-in staff user.
+     *
+     * @param staff staff user
+     * @param userManager manager for user accounts
+     * @param internshipManager manager for internships
+     * @param applicationManager manager for applications and withdrawal requests
+     */
     public StaffMenu(CareerCenterStaff staff, UserManager userManager, InternshipManager internshipManager, ApplicationManager applicationManager) {
         this.staff = staff;
         this.userManager = userManager;

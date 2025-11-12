@@ -14,11 +14,22 @@ import java.util.stream.Collectors;
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 
+/**
+ * Console UI menu for students. Allows viewing and applying for internships,
+ * accepting placements and requesting withdrawals.
+ */
 public class StudentMenu implements UserMenu {
     private Student student;
     private InternshipManager internshipManager;
     private ApplicationManager applicationManager;
 
+    /**
+     * Construct a StudentMenu bound to a particular student.
+     *
+     * @param student the student using the menu
+     * @param internshipManager manager for internships
+     * @param applicationManager manager for applications
+     */
     public StudentMenu(Student student, InternshipManager internshipManager, ApplicationManager applicationManager) {
         this.student = student;
         this.internshipManager = internshipManager;

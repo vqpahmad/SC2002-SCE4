@@ -11,6 +11,12 @@ import static org.fusesource.jansi.Ansi.Color.*;
 
 import java.util.Scanner;
 
+/**
+ * Entry point for the Internship Management System console application.
+ * <p>
+ * Responsible for initializing managers, loading data from CSV resources,
+ * and routing the user to the appropriate UI menu based on their user type.
+ */
 public class App {
     private static InternshipManager internshipManager;
     private static UserManager userManager;
@@ -18,6 +24,11 @@ public class App {
     private static UserMenu userMenu;
     private static User currentUser;
 
+    /**
+     * Application entry point.
+     *
+     * @param args command line arguments (ignored)
+     */
     public static void main(String[] args) {
         AnsiConsole.systemInstall();
         initialize();
@@ -25,6 +36,9 @@ public class App {
         AnsiConsole.systemUninstall();
     }
 
+    /**
+     * Initialize controllers and load data from CSV files into memory.
+     */
     private static void initialize() {
         userManager = new UserManager();
         internshipManager = new InternshipManager();
@@ -37,6 +51,10 @@ public class App {
         System.out.println(ansi().fg(GREEN).a("Data loaded.").reset());
     }
 
+    /**
+     * Main application loop that handles login, registration and delegates
+     * to the appropriate user menu until the user exits.
+     */
     private static void runApplication() {
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
@@ -123,6 +141,13 @@ public class App {
         scanner.close();
     }
 
+    /**
+     * Returns the UI menu implementation for the given user instance.
+     *
+     * @param user the currently logged-in user
+     * @return a {@link UserMenu} implementation for the user's type, or null
+     *         if no suitable menu exists
+     */
     private static UserMenu getUserMenu(User user) {
         if (user instanceof Student) {
             return new StudentMenu((Student) user, internshipManager, applicationManager);

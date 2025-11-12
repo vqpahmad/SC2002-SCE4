@@ -16,10 +16,21 @@ import java.util.stream.Collectors;
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 
+/**
+ * Console UI menu for a company representative. Provides commands to create,
+ * edit and remove internships, view and process applications, and change
+ * account settings.
+ */
 public class CompanyRepMenu implements UserMenu {
     private CompanyRepresentative companyRep;
     private InternshipManager internshipManager;
 
+    /**
+     * Construct a new CompanyRepMenu bound to a particular representative.
+     *
+     * @param companyRep the company representative using this menu
+     * @param internshipManager internship manager used for operations
+     */
     public CompanyRepMenu(CompanyRepresentative companyRep, InternshipManager internshipManager) {
         this.companyRep = companyRep;
         this.internshipManager = internshipManager;
