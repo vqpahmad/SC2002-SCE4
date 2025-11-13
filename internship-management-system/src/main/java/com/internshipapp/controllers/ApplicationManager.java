@@ -170,7 +170,7 @@ public class ApplicationManager {
             // Logic to withdraw other pending applications
             Student student = application.getStudent();
             for (Application otherApp : student.getApplications()) {
-                if (otherApp.getStatus() == ApplicationStatus.PENDING) {
+                if (otherApp.getStatus() != ApplicationStatus.ACCEPTED) {
                     otherApp.setStatus(ApplicationStatus.UNSUCCESSFUL);
                 }
             }
