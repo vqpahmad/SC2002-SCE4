@@ -147,6 +147,15 @@ public class StudentMenu implements UserMenu {
     }
 
     private void acceptPlacement(Scanner scanner) {
+        // Check if the student has already accepted a placement.
+        boolean alreadyAccepted = student.getApplications().stream()
+                .anyMatch(app -> app.getStatus() == com.internshipapp.enums.ApplicationStatus.ACCEPTED);
+
+        if (alreadyAccepted) {
+            System.out.println(ansi().fg(RED).a("Error: You have already accepted an internship placement.").reset());
+            return;
+        }
+
         List<Application> offeredPlacements = student.getApplications().stream()
                 .filter(app -> app.getStatus() == com.internshipapp.enums.ApplicationStatus.APPROVED)
                 .collect(Collectors.toList());
