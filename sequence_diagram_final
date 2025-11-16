@@ -1,0 +1,68 @@
+@startuml
+actor "Company Representative" as Rep
+
+boundary CompanyRepMenu
+control InternshipManager
+entity CompanyRepresentative
+entity Internship
+entity Application
+entity Student
+
+Rep -> CompanyRepMenu: select "View Applications"
+
+CompanyRepMenu -> InternshipManager: viewAllInternships()
+InternshipManager --> CompanyRepMenu: List<Internship>
+
+CompanyRepMenu -> CompanyRepMenu: getOwnedInternships()\n(filter by owner)
+
+CompanyRepMenu -> Rep: display owned internships\n+ prompt internshipId
+Rep -> CompanyRepMenu: internshipId
+
+CompanyRepMenu -> InternshipManager: findInternshipById(internshipId)
+InternshipManager --> CompanyRepMenu: Internship
+
+CompanyRepMenu -> InternshipManager: viewApplicationsForInternship(internship)
+InternshipManager --> CompanyRepMenu: List<Application>
+
+loop for each Application
+    CompanyRepMenu -> Application: getApplicationID(), getStatus()
+    CompanyRepMenu -> Application: getStudent()
+    Application --> CompanyRepMenu: Student
+    CompanyRepMenu -> Student: getName(), getYearOfStudy(), getMajor()
+end
+CompanyRepMenu -> Rep: show applications list
+
+== Decide on one application ==
+
+Rep -> CompanyRepMenu: choose Approve/Reject\n+ provide applicationID
+
+CompanyRepMenu -> InternshipManager: viewAllInternships()
+InternshipManager --> CompanyRepMenu: List<Internship>
+
+loop each owned internship
+    CompanyRepMenu -> Internship: getApplications()
+    Internship --> CompanyRepMenu: List<Application>
+    loop each application
+        CompanyRepMenu -> Application: getApplicationID(), getStatus()
+        CompanyRepMenu -> CompanyRepMenu: select matching PENDING app
+    end
+end
+
+alt approve
+    CompanyRepMenu -> InternshipManager: approveApplication(application)
+    InternshipManager -> Application: getInternship()
+    Application --> InternshipManager: Internship
+    InternshipManager -> Internship: getSlotsFilled()
+    InternshipManager -> Internship: getSlots()
+    alt slots available
+        InternshipManager -> Application: setStatus(APPROVED)
+    else no slots
+        InternshipManager --> CompanyRepMenu: "Cannot approve, slots filled"
+    end
+else reject
+    CompanyRepMenu -> InternshipManager: rejectApplication(application)
+    InternshipManager -> Application: setStatus(UNSUCCESSFUL)
+end
+
+CompanyRepMenu -> Rep: show result message
+@enduml
