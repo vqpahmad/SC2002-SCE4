@@ -176,8 +176,8 @@ public class InternshipManager {
 
                     // Filter 2: Level must match the student's year of study.
                     boolean levelMatch;
-                    if (student.getYearOfStudy() == 1) {
-                        // Year 1 students can only see BASIC level internships.
+                    if (student.getYearOfStudy() <= 2) {
+                        // Year 1 and 2 students can only see BASIC level internships.
                         levelMatch = (i.getLevel() == InternshipLevel.BASIC);
                     } else {
                         // Students in other years can see all levels.
